@@ -1,2 +1,2 @@
 # quanttide-library-of-philosophy
-量潮元图书馆
+量潮元工程图书馆
