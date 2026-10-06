@@ -65,6 +65,62 @@ Engine::new(initial_situation, preconditions, apply_fn)
 
 `Situation` / `Action` / `Precondition` 三个 trait 直接对应到范畴模型的对象、态射和守卫。
 
+## 替代方案
+
+直接替代（同样做「范畴论 + 本体 + Rust」）的库很少，但按功能拆开，每一块都有替代方案。pr4xis 的独特之处在于组合：用 Rust 类型系统把范畴论结构（Category / Functor / Natural Transformation）编译进去，让本体之间的映射和整合有证明可查。这个组合——范畴论形式化 + Rust 编译期校验 + 多域本体组合——在开源生态里没有明显的直接对等物。
+
+### 范畴论基础设施
+
+如果只需要范畴论的 Rust 原语（范畴、函子、自然变换、伴随、Yoneda），而不需要完整本体引擎：
+
+| 库 | 定位 |
+|:--|:--|
+| algar | Rust 范畴论实现，作者定位是学习/探索性质，实现了范畴、函子、自然变换等基本结构 |
+| lau-category-theory | 抽象范畴论 Rust 实现，覆盖 functor、adjunction、limits/colimits、monad、Yoneda，并附 agent-protocol 组合应用示例 |
+| karpal_topos | 拓扑斯论构造：小范畴、预层（presheaf）、可表示预层、筛、Yoneda 引理，面向「结构化空性」的代数基础设施 |
+| symthaea_core | 纯 Rust 实现的抽象范畴、函子、自然变换、伴随、monad、极限/余极限、Yoneda 嵌入，不依赖外部 crate |
+| csw-core | 「Categorical Semantics Workbench」的核心范畴结构，用于定义范畴并推导类型系统 |
+
+这些库提供范畴论的计算抽象，但不绑定本体格式，也不做跨域映射证明。
+
+### 本体推理
+
+如果要的是 OWL/RDF 本体推理，Rust 生态里有更成熟的专用库：
+
+| 库 | 能力 |
+|:--|:--|
+| reasonable | OWL 2 RL reasoner，有 Python 绑定（pyreasonable），输出 base + inferred 三元组 |
+| OntoLogos | 模块化 Rust 本体 reasoner，支持 OWL EL、OWL RL、RDFS，含解释生成和增量分类 |
+| rustdl | OWL 2 DL（SROIQ）reasoner，原生 Rust，无 JVM、无子进程，有 Python 绑定 |
+
+这些是标准本体语言（OWL/RDF）的推理器，走描述逻辑路线而非范畴论路线。如果「替代」指「能推理就行」，它们是成熟选项；如果要「用函子证明跨域映射正确」，它们不覆盖。
+
+### 知识图谱与语义图
+
+| 库 | 定位 |
+|:--|:--|
+| quipu-ai | AI-native 知识图谱，带严格本体强制（ontology enforcement） |
+| lattix | 知识图谱基底：三元组、异质图、中心性/社区算法、RDF 格式支持 |
+| rowl | Dolfin Ontology Language 解析器 |
+
+这些库处理图结构与格式解析，不涉及范畴论的形式化层。
+
+### 理论传统
+
+pr4xis 自述受 Spivak 的 Ologs 影响。Ologs（ontology logs）是 Spivak 和 Kent 提出的范畴论知识表示框架，用范畴论的图表来表达本体，是 pr4xis 的理论前身，但不是软件替代品——它是数学框架，没有对应的 Rust 实现。IFF（Information Flow Framework）有专门的 Category Theory Ontology（IFF-CAT）作为元本体，是范畴论本体的标准参考，同样不是可运行的软件库。
+
+### 替代边界
+
+| 替代的是哪一块 | 有成熟替代 | 代表 |
+|:--|:--|:--|
+| 范畴论 Rust 原语 | 有 | algar、lau-category-theory、karpal_topos、symthaea_core |
+| OWL/RDF 本体推理 | 有 | reasonable、OntoLogos、rustdl |
+| 知识图谱装载/图算法 | 有 | quipu-ai、lattix |
+| 范畴论形式化 + 本体组合 + Rust 编译期证明 | 无直接对等物 | pr4xis 自称是首个此类可执行基底 |
+| Ologs / IFF-CAT 理论框架 | 有理论，无软件 | Spivak Ologs、IFF-CAT |
+
+只替代其中某一层，有现成选项；要 pr4xis 那种「范畴论当基底、函子当映射、编译期校验当证明」的完整组合，目前没有开箱即用的替代品。最接近的理论路线是 Ologs 加自己的范畴论实现，但那意味着自己补上 pr4xis 已经做掉的工程。
+
 ## 许可证
 
 CC-BY-NC-SA-4.0
